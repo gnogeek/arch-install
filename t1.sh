@@ -29,16 +29,6 @@ error_print () {
     echo -e "${BOLD}${BRED}[ ${BBLUE}•${BRED} ] $1${RESET}"
 }
 
-# Choosing the target for the installation.
-info_print "Available disks for the installation:"
-PS3="Please select the number of the corresponding disk (e.g. 1): "
-select ENTRY in $(lsblk -dpnoNAME|grep -P "/dev/sd|nvme|vd");
-do
-    DISK="$ENTRY"
-    info_print "Arch Linux will be installed on the following disk: $DISK"
-    break
-done
-
 # Setting up a password for the user account (function).
     input_print "Please enter name for a user account (enter empty to not create one): "
     read -r username
@@ -63,44 +53,22 @@ export COUNTRY="US"
 export HOSTNAME=$hostname
 export USERNAME=$username
 export PASSWORD=$USERNAME # It is not recommended to set production passwords here.
-#export EFIPARTITION=/dev/nvme0n1p1
-#export ROOTPARTITION=/dev/nvme0n1p2
+export EFIPARTITION=/dev/nvme0n1p1
+export ROOTPARTITION=/dev/nvme0n1p2
 #export HOMEPARTITION=/dev/nvme0n1p5
-export EFIPARTITION=${DISK}1
-export ROOTPARTITION=${DISK}2
+#export EFIPARTITION=${DISK}p1
+#export ROOTPARTITION=${DISK}p2
 #export HOMEPARTITION=/dev/sda5
 #export SWAPPARTITION=/dev/nvme0n1p5
-#export DISKID=$(lsblk $ROOTPARTITION -o partuuid -n)
+export DISKID=$(lsblk $ROOTPARTITION -o partuuid -n)
 
 # Find and set mirrors. This mirror list will be automatically copied into the installed system.
 #pacman -Sy --needed --noconfirm reflector
 #reflector --country $COUNTRY --age 20 --latest 15 --sort rate --protocol https --save /etc/pacman.d/mirrorlist
 
-# Use MBR, partition the whole disk with one partition, bootable, no swap.
-#parted -a optimal $DISK mklabel msdos mkpart primary 0% 100% set 1 boot on 
-
-# Warn user about deletion of old partition scheme.
-input_print "This will delete the current partition table on $DISK once installation starts. Do you agree [y/N]?: "
-read -r disk_response
-if ! [[ "${disk_response,,}" =~ ^(yes|y)$ ]]; then
-    error_print "Quitting."
-    exit
-fi
-info_print "Wiping $DISK."
-wipefs -af "$DISK" &>/dev/null
-sgdisk -Zo "$DISK" &>/dev/null
-
-# Creating a new partition scheme.
-info_print "Creating the partitions on $DISK."
-parted -s "$DISK" \
-    mklabel gpt \
-    mkpart EFIPARTITION fat32 1MiB 1025MiB \
-    set 1 esp on \
-    mkpart ROOTPARTITION 1025MiB 100% \
-
 # Get the "/dev/..." name of the first partition, format it and mount.
 mkfs.btrfs -f $ROOTPARTITION
-mkfs.vfat $EFIPARTITION
+#mkfs.vfat $EFIPARTITION
 mount $ROOTPARTITION /mnt
 btrfs subvolume create /mnt/@
 btrfs subvolume create /mnt/@home
