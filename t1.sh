@@ -53,7 +53,7 @@ export COUNTRY="US"
 export HOSTNAME=$hostname
 export USERNAME=$username
 export PASSWORD=$USERNAME # It is not recommended to set production passwords here.
-export EFIPARTITION=/dev/nvme0n1p1
+export EFIPARTITION=/dev/sda1
 export ROOTPARTITION=/dev/nvme0n1p2
 #export HOMEPARTITION=/dev/nvme0n1p5
 #export EFIPARTITION=${DISK}p1
@@ -68,7 +68,7 @@ export DISKID=$(lsblk $ROOTPARTITION -o partuuid -n)
 
 # Get the "/dev/..." name of the first partition, format it and mount.
 mkfs.btrfs -f $ROOTPARTITION
-#mkfs.vfat $EFIPARTITION
+mkfs.vfat $EFIPARTITION
 mount $ROOTPARTITION /mnt
 btrfs subvolume create /mnt/@
 btrfs subvolume create /mnt/@home
