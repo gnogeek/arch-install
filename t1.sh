@@ -54,7 +54,7 @@ export HOSTNAME=$hostname
 export USERNAME=$username
 export PASSWORD=$USERNAME # It is not recommended to set production passwords here.
 export EFIPARTITION=/dev/sda1
-export ROOTPARTITION=/dev/sda
+export ROOTPARTITION=/dev/sda2
 #export HOMEPARTITION=/dev/nvme0n1p5
 #export EFIPARTITION=${DISK}p1
 #export ROOTPARTITION=${DISK}p2
@@ -73,7 +73,7 @@ mount $ROOTPARTITION /mnt
 btrfs subvolume create /mnt/@
 btrfs subvolume create /mnt/@home
 btrfs subvolume create /mnt/@var
-btrfs subvolume create /mnt/@snapshots
+btrfs subvolume create /mnt/.@snapshots
 umount /mnt
 mount -o subvol=@,defaults,ssd,autodefrag,noatime,nodiratime,compress-force=zstd:13 $ROOTPARTITION /mnt
 mkdir /mnt/{boot,home,.snapshots,var}
@@ -273,7 +273,7 @@ export -f archroot
 arch-chroot /mnt /bin/bash -c "archroot" || echo "arch-chroot returned: $?"
 
 # Lazy unmount.
-#umount -l /mnt
+umount -l /mnt
 
 cat << 'EOT'
 ******************************************************
