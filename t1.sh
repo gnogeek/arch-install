@@ -68,12 +68,12 @@ export DISKID=$(lsblk $ROOTPARTITION -o partuuid -n)
 
 # Get the "/dev/..." name of the first partition, format it and mount.
 mkfs.btrfs -f $ROOTPARTITION
-mkfs.vfat $EFIPARTITION
+#mkfs.vfat $EFIPARTITION
 mount $ROOTPARTITION /mnt
 btrfs subvolume create /mnt/@
 btrfs subvolume create /mnt/@home
 btrfs subvolume create /mnt/@var
-btrfs subvolume create /mnt/.@snapshots
+btrfs subvolume create /mnt/@.snapshots
 umount /mnt
 mount -o subvol=@,defaults,ssd,autodefrag,noatime,nodiratime,compress-force=zstd:13 $ROOTPARTITION /mnt
 mkdir /mnt/{boot,home,.snapshots,var}
@@ -83,7 +83,7 @@ mount $EFIPARTITION /mnt/boot
 
 
 # Install base files and update fstab.
-pacstrap -K /mnt base linux linux-firmware git vim intel-ucode btrfs-progs
+pacstrap -K /mnt base linux linux-firmware intel-ucode btrfs-progs
 genfstab -U /mnt >> /mnt/etc/fstab
 
 # Extend logging to persistant storage.
@@ -207,7 +207,7 @@ title Arch Linux
 linux /vmlinuz-linux  
 initrd /intel-ucode.img  
 initrd /initramfs-linux.img  
-options root=$ROOTPARTITION rootfstype=btrfs rootflags=subvol=@ elevator=deadline add_efi_memmap rw quiet splash loglevel=3 vt.global_cursor_default=0 plymouth.ignore_serial_consoles vga=current rd.systemd.show_status=auto r.udev.log_priority=3 nowatchdog fbcon=nodefer i915.fastboot=1 i915.invert_brightness=1
+options root=PARTUUID=$DISKID rootfstype=btrfs rootflags=subvol=@ elevator=deadline add_efi_memmap rw quiet splash loglevel=3 vt.global_cursor_default=0 plymouth.ignore_serial_consoles vga=current rd.systemd.show_status=auto r.udev.log_priority=3 nowatchdog fbcon=nodefer i915.fastboot=1 i915.invert_brightness=1
 EOF
 
 
