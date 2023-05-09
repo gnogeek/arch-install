@@ -81,7 +81,7 @@ mount -o subvol=@home,defaults,ssd,autodefrag,noatime,nodiratime,compress=zstd $
 mount -o subvol=@var,defaults,ssd,autodefrag,noatime,nodiratime $ROOTPARTITION /mnt/var
 mount $EFIPARTITION /mnt/boot
 
-
+sed -i '1iServer = http://192.168.100.225:7878/$repo/os/$arch' /etc/pacman.d/mirrorlist
 # Install base files and update fstab.
 pacstrap -K /mnt base linux linux-firmware intel-ucode btrfs-progs
 genfstab -U /mnt >> /mnt/etc/fstab
@@ -214,34 +214,7 @@ EOF
 mkinitcpio -p linux
 
   
-  # Install some software and append some options to the corresponding config file.
-  pacman -S --needed --noconfirm tilix
-  cat >> /home/$USERNAME/.bashrc << 'EOT' 
-if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
-        source /etc/profile.d/vte.sh
-fi
-EOT
-
-  sudo -u $USERNAME yay -S --needed --noconfirm powerline powerline-fonts-git
-  cat >> /home/$USERNAME/.bashrc << 'EOT'
-powerline-daemon -q
-POWERLINE_BASH_CONTINUATION=1
-POWERLINE_BASH_SELECT=1
-. /usr/share/powerline/bindings/bash/powerline.sh
-EOT
-
-  # Append some options to config files.
-  cat >> /home/$USERNAME/.vimrc << 'EOT'
-let g:powerline_pycmd="py3"
-set rtp+=/usr/lib/python3.*/site-packages/powerline/bindings/vim
-set laststatus=2
-syntax enable
-EOT
-
-  cat >> /home/$USERNAME/.tmux.conf << 'EOT'
-set -g default-terminal "screen-256color"
-source /usr/lib/python3.*/site-packages/powerline/bindings/tmux/powerline.conf
-EOT
+    sudo -u $USERNAME yay -S --needed --noconfirm timeshift timeshift-autosnap
 
   # Install and set an icon theme for Gnome.
   #sudo -u $USERNAME paru -S --needed --noconfirm paper-icon-theme-git
