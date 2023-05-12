@@ -72,8 +72,8 @@ mkfs.vfat $EFIPARTITION
 mount $ROOTPARTITION /mnt
 btrfs subvolume create /mnt/@
 btrfs subvolume create /mnt/@home
-#btrfs subvolume create /mnt/@var
-#btrfs subvolume create /mnt/@.snapshots
+btrfs subvolume create /mnt/@var
+btrfs subvolume create /mnt/@.snapshots
 umount /mnt
 #mount -o subvol=@,defaults,ssd,autodefrag,noatime,nodiratime,compress-force=zstd $ROOTPARTITION /mnt
 mount -o subvol=@,ssd,noatime,compress=zstd,space_cache=v2,discard=async $ROOTPARTITION /mnt
