@@ -75,9 +75,13 @@ btrfs subvolume create /mnt/@home
 #btrfs subvolume create /mnt/@var
 #btrfs subvolume create /mnt/@.snapshots
 umount /mnt
-mount -o subvol=@,defaults,ssd,autodefrag,noatime,nodiratime,compress-force=zstd $ROOTPARTITION /mnt
+#mount -o subvol=@,defaults,ssd,autodefrag,noatime,nodiratime,compress-force=zstd $ROOTPARTITION /mnt
+mount -o subvol=@,ssd,noatime,compress=zstd,space_cache=v2,discard=async $ROOTPARTITION /mnt
+
 mkdir /mnt/{boot,home}
-mount -o subvol=@home,defaults,ssd,autodefrag,noatime,nodiratime,compress=zstd $ROOTPARTITION /mnt/home
+#mount -o subvol=@home,defaults,ssd,autodefrag,noatime,nodiratime,compress=zstd $ROOTPARTITION /mnt/home
+mount -o subvol=@home,ssd,noatime,compress=zstd,space_cache=v2,discard=async $ROOTPARTITION /mnt/home
+
 #mount -o subvol=@var,defaults,ssd,autodefrag,noatime,nodiratime $ROOTPARTITION /mnt/var
 #mount -o subvol=@.snapshots,defaults,ssd,autodefrag,noatime,nodiratime $ROOTPARTITION /mnt/.snapshots
 mount $EFIPARTITION /mnt/boot
