@@ -78,7 +78,7 @@ umount /mnt
 #mount -o subvol=@,defaults,ssd,autodefrag,noatime,nodiratime,compress-force=zstd $ROOTPARTITION /mnt
 mount -o subvol=@,ssd,noatime,compress=zstd,space_cache=v2,discard=async $ROOTPARTITION /mnt
 
-mkdir /mnt/{boot,home,var,.snapshots}
+mkdir /mnt/{boot,home,var}
 #mount -o subvol=@home,defaults,ssd,autodefrag,noatime,nodiratime,compress=zstd $ROOTPARTITION /mnt/home
 mount -o subvol=@home,ssd,noatime,compress=zstd,space_cache=v2,discard=async $ROOTPARTITION /mnt/home
 
