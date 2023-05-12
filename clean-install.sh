@@ -177,7 +177,7 @@ EOF
 mkinitcpio -p linux
 
 #Install timeshift
-sudo -u $USERNAME yay -S --needed --noconfirm snapper-support btrfs-assistant sddm-git kitty
+sudo -u $USERNAME yay -S --needed --noconfirm timeshift timeshift-autosnap sddm-git kitty
 
     
   # Reconfigure sudo, so that a password is need to elevate privileges.
