@@ -73,7 +73,7 @@ mount $ROOTPARTITION /mnt
 btrfs subvolume create /mnt/@
 btrfs subvolume create /mnt/@home
 btrfs subvolume create /mnt/@var
-btrfs subvolume create /mnt/@.snapshots
+#btrfs subvolume create /mnt/@.snapshots
 umount /mnt
 #mount -o subvol=@,defaults,ssd,autodefrag,noatime,nodiratime,compress-force=zstd $ROOTPARTITION /mnt
 mount -o subvol=@,ssd,noatime,compress=zstd,space_cache=v2,discard=async $ROOTPARTITION /mnt
@@ -83,7 +83,7 @@ mkdir /mnt/{boot,home,var,.snapshots}
 mount -o subvol=@home,ssd,noatime,compress=zstd,space_cache=v2,discard=async $ROOTPARTITION /mnt/home
 
 mount -o subvol=@var,ssd,noatime,compress=zstd,space_cache=v2,discard=async $ROOTPARTITION /mnt/var
-mount -o subvol=@.snapshots,ssd,noatime,compress=zstd,space_cache=v2,discard=async $ROOTPARTITION /mnt/.snapshots
+#mount -o subvol=@.snapshots,ssd,noatime,compress=zstd,space_cache=v2,discard=async $ROOTPARTITION /mnt/.snapshots
 mount $EFIPARTITION /mnt/boot
 
 sed -i '1iServer = http://192.168.100.225:7878/$repo/os/$arch' /etc/pacman.d/mirrorlist
