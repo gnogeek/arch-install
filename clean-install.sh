@@ -68,7 +68,7 @@ export DISKID=$(lsblk $ROOTPARTITION -o partuuid -n)
 
 # Get the "/dev/..." name of the first partition, format it and mount.
 mkfs.btrfs -f $ROOTPARTITION
-#mkfs.vfat $EFIPARTITION
+mkfs.vfat $EFIPARTITION
 mount $ROOTPARTITION /mnt
 btrfs subvolume create /mnt/@
 btrfs subvolume create /mnt/@home
