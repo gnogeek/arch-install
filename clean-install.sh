@@ -60,6 +60,7 @@ export ROOTPARTITION=/dev/sda2
 #export ROOTPARTITION=${DISK}p2
 #export HOMEPARTITION=/dev/sda5
 #export SWAPPARTITION=/dev/nvme0n1p5
+export sv_opts="rw,noatime,compress-force=zstd:1,space_cache=v2"
 export DISKID=$(lsblk $ROOTPARTITION -o partuuid -n)
 
 # Find and set mirrors. This mirror list will be automatically copied into the installed system.
@@ -70,25 +71,28 @@ export DISKID=$(lsblk $ROOTPARTITION -o partuuid -n)
 mkfs.btrfs -f $ROOTPARTITION
 mkfs.vfat $EFIPARTITION
 mount $ROOTPARTITION /mnt
-btrfs subvolume create /mnt/@
 btrfs subvolume create /mnt/@home
-btrfs subvolume create /mnt/@var
-#btrfs subvolume create /mnt/@.snapshots
+btrfs subvolume create /mnt/@snapshots
+btrfs subvolume create /mnt/@cache
+btrfs subvolume create /mnt/@log
+btrfs subvolume create /mnt/@tmp
 umount /mnt
+mount -o ${sv_opts},subvol=@ $ROOTPARTITION /mnt
+mkdir -p /mnt/{home,.snapshots,var/cache,var/log,var/tmp}
+
 #mount -o subvol=@,defaults,ssd,autodefrag,noatime,nodiratime,compress-force=zstd $ROOTPARTITION /mnt
 mount -o subvol=@,ssd,noatime,compress=zstd,space_cache=v2,discard=async $ROOTPARTITION /mnt
-
-mkdir /mnt/{boot,home,var}
-#mount -o subvol=@home,defaults,ssd,autodefrag,noatime,nodiratime,compress=zstd $ROOTPARTITION /mnt/home
-mount -o subvol=@home,ssd,noatime,compress=zstd,space_cache=v2,discard=async $ROOTPARTITION /mnt/home
-
-mount -o subvol=@var,ssd,noatime,compress=zstd,space_cache=v2,discard=async $ROOTPARTITION /mnt/var
-#mount -o subvol=@.snapshots,ssd,noatime,compress=zstd,space_cache=v2,discard=async $ROOTPARTITION /mnt/.snapshots
-mount $EFIPARTITION /mnt/boot
+mount -o ${sv_opts},subvol=@home $ROOTPARTITION /mnt/home
+mount -o ${sv_opts},subvol=@snapshots $ROOTPARTITION /mnt/.snapshots
+mount -o ${sv_opts},subvol=@cache $ROOTPARTITION /mnt/var/cache
+mount -o ${sv_opts},subvol=@log $ROOTPARTITION /mnt/var/log
+mount -o ${sv_opts},subvol=@tmp $ROOTPARTITION /mnt/var/tmp
+mkdir /mnt/efi
+mount $EFIPARTITION /mnt/efi
 
 sed -i '1iServer = http://192.168.100.225:7878/$repo/os/$arch' /etc/pacman.d/mirrorlist
 # Install base files and update fstab.
-pacstrap -K /mnt base linux linux-firmware intel-ucode btrfs-progs
+pacstrap -K /mnt base linux linux-firmware intel-ucode btrfs-progs pacman-contrib
 genfstab -U /mnt >> /mnt/etc/fstab
 sed -i 's/subvolid=.*,//' /etc/fstab
 # Extend logging to persistant storage.
@@ -155,7 +159,7 @@ archroot() {
   
   # Install boot manager.   
  bootctl install
-  tee -a /boot/loader/loader.conf <<EOF
+  tee -a /efi/loader/loader.conf <<EOF
 default      arch.conf
 timeout      0
 editor       no
@@ -166,7 +170,7 @@ EOF
   sed -i 's,#COMPRESSION="zstd",COMPRESSION="zstd",g' /etc/mkinitcpio.conf
   sed -i 's,MODULES=(),MODULES=(btrfs),g' /etc/mkinitcpio.conf
 ##
-  tee -a /boot/loader/entries/arch.conf <<EOF
+  tee -a /efi/loader/entries/arch.conf <<EOF
 title Arch Linux  
 linux /vmlinuz-linux  
 initrd /intel-ucode.img  
