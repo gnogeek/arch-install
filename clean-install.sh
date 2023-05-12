@@ -75,10 +75,11 @@ btrfs subvolume create /mnt/@home
 btrfs subvolume create /mnt/@var
 btrfs subvolume create /mnt/@.snapshots
 umount /mnt
-mount -o subvol=@,defaults,ssd,autodefrag,noatime,nodiratime,compress-force=zstd:13 $ROOTPARTITION /mnt
+mount -o subvol=@,defaults,ssd,autodefrag,noatime,nodiratime,compress-force=zstd $ROOTPARTITION /mnt
 mkdir /mnt/{boot,home,.snapshots,var}
 mount -o subvol=@home,defaults,ssd,autodefrag,noatime,nodiratime,compress=zstd $ROOTPARTITION /mnt/home
 mount -o subvol=@var,defaults,ssd,autodefrag,noatime,nodiratime $ROOTPARTITION /mnt/var
+mount -o subvol=@.snapshot,defaults,ssd,autodefrag,noatime,nodiratime $ROOTPARTITION /mnt/.snapshots
 mount $EFIPARTITION /mnt/boot
 
 sed -i '1iServer = http://192.168.100.225:7878/$repo/os/$arch' /etc/pacman.d/mirrorlist
@@ -121,7 +122,7 @@ archroot() {
   pacman -S --needed --noconfirm networkmanager
   systemctl enable NetworkManager
   # Install other packages
-  pacman -S --needed --noconfirm efibootmgr openssh xf86-video-intel wireless_tools wpa_supplicant dialog wget nano neovim
+  pacman -S --needed --noconfirm efibootmgr openssh xf86-video-intel wireless_tools wpa_supplicant dialog wget nano neovim hyprland polkit-kde-agent
 
   systemctl enable fstrim.timer
   # Install and configure sudo.
@@ -172,7 +173,7 @@ EOF
 mkinitcpio -p linux
 
 #Install timeshift
-sudo -u $USERNAME yay -S --needed --noconfirm timeshift timeshift-autosnap
+sudo -u $USERNAME yay -S --needed --noconfirm timeshift timeshift-autosnap sddm-git kitty
 
     
   # Reconfigure sudo, so that a password is need to elevate privileges.
