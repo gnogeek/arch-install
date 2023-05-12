@@ -79,7 +79,7 @@ mount -o subvol=@,defaults,ssd,autodefrag,noatime,nodiratime,compress-force=zstd
 mkdir /mnt/{boot,home,.snapshots,var}
 mount -o subvol=@home,defaults,ssd,autodefrag,noatime,nodiratime,compress=zstd $ROOTPARTITION /mnt/home
 mount -o subvol=@var,defaults,ssd,autodefrag,noatime,nodiratime $ROOTPARTITION /mnt/var
-mount -o subvol=@.snapshot,defaults,ssd,autodefrag,noatime,nodiratime $ROOTPARTITION /mnt/.snapshots
+mount -o subvol=@.snapshots,defaults,ssd,autodefrag,noatime,nodiratime $ROOTPARTITION /mnt/.snapshots
 mount $EFIPARTITION /mnt/boot
 
 sed -i '1iServer = http://192.168.100.225:7878/$repo/os/$arch' /etc/pacman.d/mirrorlist
