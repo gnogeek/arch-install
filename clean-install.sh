@@ -90,7 +90,7 @@ sed -i '1iServer = http://192.168.100.225:7878/$repo/os/$arch' /etc/pacman.d/mir
 # Install base files and update fstab.
 pacstrap -K /mnt base linux linux-firmware intel-ucode btrfs-progs
 genfstab -U /mnt >> /mnt/etc/fstab
-
+sed -i 's/subvolid=.*,//' /etc/fstab
 # Extend logging to persistant storage.
 cp "$LOGFILE" /mnt/root/
 exec &> >(tee -a "$LOGFILE" | tee -a "/mnt/root/$LOGFILE")
