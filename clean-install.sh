@@ -79,9 +79,6 @@ btrfs subvolume create /mnt/@tmp
 umount /mnt
 mount -o ${sv_opts},subvol=@ $ROOTPARTITION /mnt
 mkdir -p /mnt/{home,.snapshots,var/cache,var/log,var/tmp}
-
-#mount -o subvol=@,defaults,ssd,autodefrag,noatime,nodiratime,compress-force=zstd $ROOTPARTITION /mnt
-mount -o subvol=@,ssd,noatime,compress=zstd,space_cache=v2,discard=async $ROOTPARTITION /mnt
 mount -o ${sv_opts},subvol=@home $ROOTPARTITION /mnt/home
 mount -o ${sv_opts},subvol=@snapshots $ROOTPARTITION /mnt/.snapshots
 mount -o ${sv_opts},subvol=@cache $ROOTPARTITION /mnt/var/cache
