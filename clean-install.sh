@@ -71,6 +71,7 @@ export DISKID=$(lsblk $ROOTPARTITION -o partuuid -n)
 mkfs.btrfs -f $ROOTPARTITION
 mkfs.vfat $EFIPARTITION
 mount $ROOTPARTITION /mnt
+btrfs subvolume create /mnt/@
 btrfs subvolume create /mnt/@home
 btrfs subvolume create /mnt/@snapshots
 btrfs subvolume create /mnt/@cache
