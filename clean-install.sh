@@ -85,8 +85,8 @@ mount -o ${sv_opts},subvol=@snapshots $ROOTPARTITION /mnt/.snapshots
 mount -o ${sv_opts},subvol=@cache $ROOTPARTITION /mnt/var/cache
 mount -o ${sv_opts},subvol=@log $ROOTPARTITION /mnt/var/log
 mount -o ${sv_opts},subvol=@tmp $ROOTPARTITION /mnt/var/tmp
-mkdir /mnt/efi
-mount $EFIPARTITION /mnt/efi
+mkdir /mnt/boot
+mount $EFIPARTITION /mnt/boot
 
 sed -i '1iServer = http://192.168.100.225:7878/$repo/os/$arch' /etc/pacman.d/mirrorlist
 # Install base files and update fstab.
@@ -157,7 +157,7 @@ archroot() {
   
   # Install boot manager.   
  bootctl install
-  tee -a /efi/loader/loader.conf <<EOF
+  tee -a /boot/loader/loader.conf <<EOF
 default      arch.conf
 timeout      0
 editor       no
@@ -168,7 +168,7 @@ EOF
   sed -i 's,#COMPRESSION="zstd",COMPRESSION="zstd",g' /etc/mkinitcpio.conf
   sed -i 's,MODULES=(),MODULES=(btrfs),g' /etc/mkinitcpio.conf
 ##
-  tee -a /efi/loader/entries/arch.conf <<EOF
+  tee -a /boot/loader/entries/arch.conf <<EOF
 title Arch Linux  
 linux /vmlinuz-linux  
 initrd /intel-ucode.img  
