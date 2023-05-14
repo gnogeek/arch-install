@@ -139,6 +139,7 @@ archroot() {
 
   # Create a new user and add it to the wheel group.
   useradd -m -G wheel $USERNAME
+  useradd -m -G video $USERNAME
   echo $USERNAME:$PASSWORD | chpasswd
   passwd -e $USERNAME # Force user to change password at next login.
   passwd -dl root # Delete root password and lock root account.
@@ -182,6 +183,10 @@ mkinitcpio -p linux
 
 #Install timeshift
 sudo -u $USERNAME yay -S --needed --noconfirm timeshift timeshift-autosnap
+
+  tee -a /etc/udev/rules.d/backlight.rules <<EOF
+ACTION=="add", SUBSYSTEM=="backlight", RUN+="/bin/chgrp video $sys$devpath/brightness", RUN+="/bin/chmod g+w $sys$devpath/brightness"
+EOF
 
     
   # Reconfigure sudo, so that a password is need to elevate privileges.
