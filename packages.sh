@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+## 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
+
 #Main Packages
 yay -S hyprland nano openssh pacman-contrib sddm-git waybar-hyprland-git
 
