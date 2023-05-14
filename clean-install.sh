@@ -92,6 +92,8 @@ sed -i '1iServer = http://192.168.100.225:7878/$repo/os/$arch' /etc/pacman.d/mir
 # Install base files and update fstab.
 pacstrap -K /mnt base linux linux-firmware intel-ucode btrfs-progs pacman-contrib
 genfstab -U /mnt >> /mnt/etc/fstab
+
+##
 sed -i 's/subvolid=.*,//' /etc/fstab
 # Extend logging to persistant storage.
 cp "$LOGFILE" /mnt/root/
@@ -128,7 +130,7 @@ archroot() {
   pacman -S --needed --noconfirm networkmanager
   systemctl enable NetworkManager
   # Install other packages
-  pacman -S --needed --noconfirm efibootmgr openssh xf86-video-intel wireless_tools wpa_supplicant dialog wget nano neovim hyprland polkit-kde-agent
+  pacman -S --needed --noconfirm efibootmgr openssh xf86-video-intel wireless_tools wpa_supplicant dialog wget nano
 
   systemctl enable fstrim.timer
   # Install and configure sudo.
@@ -179,7 +181,7 @@ EOF
 mkinitcpio -p linux
 
 #Install timeshift
-sudo -u $USERNAME yay -S --needed --noconfirm timeshift timeshift-autosnap sddm-git kitty
+sudo -u $USERNAME yay -S --needed --noconfirm timeshift timeshift-autosnap
 
     
   # Reconfigure sudo, so that a password is need to elevate privileges.
