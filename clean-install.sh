@@ -182,7 +182,7 @@ EOF
 mkinitcpio -p linux
 
 #Install timeshift
-sudo -u $USERNAME yay -S --needed --noconfirm timeshift timeshift-autosnap
+sudo -u $USERNAME yay -S --needed --noconfirm timeshift timeshift-autosnap xdg-user-dirs
 
   tee -a /etc/udev/rules.d/backlight.rules <<EOF
 ACTION=="add", SUBSYSTEM=="backlight", RUN+="/bin/chgrp video $sys$devpath/brightness", RUN+="/bin/chmod g+w $sys$devpath/brightness"
