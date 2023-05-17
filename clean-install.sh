@@ -54,7 +54,7 @@ export HOSTNAME=$hostname
 export USERNAME=$username
 export PASSWORD=$USERNAME # It is not recommended to set production passwords here.
 export EFIPARTITION=/dev/sda1
-export ROOTPARTITION=/dev/sda2
+export ROOTPARTITION=/dev/sda4
 #export HOMEPARTITION=/dev/nvme0n1p5
 #export EFIPARTITION=${DISK}p1
 #export ROOTPARTITION=${DISK}p2
@@ -69,7 +69,7 @@ export DISKID=$(lsblk $ROOTPARTITION -o partuuid -n)
 
 # Get the "/dev/..." name of the first partition, format it and mount.
 mkfs.btrfs -f $ROOTPARTITION
-mkfs.vfat $EFIPARTITION
+#mkfs.vfat $EFIPARTITION
 mount $ROOTPARTITION /mnt
 btrfs subvolume create /mnt/@
 btrfs subvolume create /mnt/@home
@@ -79,13 +79,12 @@ btrfs subvolume create /mnt/@log
 btrfs subvolume create /mnt/@tmp
 umount /mnt
 mount -o ${sv_opts},subvol=@ $ROOTPARTITION /mnt
-mkdir -p /mnt/{home,.snapshots,var/cache,var/log,var/tmp}
+mkdir -p /mnt/{home,.snapshots,var/cache,var/log,var/tmp,boot}
 mount -o ${sv_opts},subvol=@home $ROOTPARTITION /mnt/home
 mount -o ${sv_opts},subvol=@snapshots $ROOTPARTITION /mnt/.snapshots
 mount -o ${sv_opts},subvol=@cache $ROOTPARTITION /mnt/var/cache
 mount -o ${sv_opts},subvol=@log $ROOTPARTITION /mnt/var/log
 mount -o ${sv_opts},subvol=@tmp $ROOTPARTITION /mnt/var/tmp
-mkdir /mnt/boot
 mount $EFIPARTITION /mnt/boot
 
 sed -i '1iServer = http://192.168.100.225:7878/$repo/os/$arch' /etc/pacman.d/mirrorlist
@@ -139,7 +138,6 @@ archroot() {
 
   # Create a new user and add it to the wheel group.
   useradd -m -G wheel $USERNAME
-  useradd -m -G video $USERNAME
   echo $USERNAME:$PASSWORD | chpasswd
   passwd -e $USERNAME # Force user to change password at next login.
   passwd -dl root # Delete root password and lock root account.
@@ -155,9 +153,7 @@ archroot() {
   cd .. && rm -R yay
   sed -i '/^#Color/s/#//' /etc/pacman.conf # Uncomment line with sed
 
-    # Install some software. 
-  pacman -S --needed --noconfirm firefox konsole tmux man
-  
+    # Install some software.   
   # Install boot manager.   
  bootctl install
   tee -a /boot/loader/loader.conf <<EOF
@@ -182,7 +178,7 @@ EOF
 mkinitcpio -p linux
 
 #Install timeshift
-sudo -u $USERNAME yay -S --needed --noconfirm timeshift timeshift-autosnap xdg-user-dirs
+sudo -u $USERNAME yay -S --needed --noconfirm timeshift timeshift-autosnap
 
   tee -a /etc/udev/rules.d/backlight.rules <<EOF
 ACTION=="add", SUBSYSTEM=="backlight", RUN+="/bin/chgrp video $sys$devpath/brightness", RUN+="/bin/chmod g+w $sys$devpath/brightness"
