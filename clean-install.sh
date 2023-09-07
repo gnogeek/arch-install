@@ -87,7 +87,7 @@ mount -o ${sv_opts},subvol=@log $ROOTPARTITION /mnt/var/log
 mount -o ${sv_opts},subvol=@tmp $ROOTPARTITION /mnt/var/tmp
 mount $EFIPARTITION /mnt/boot
 
-sed -i '1iServer = http://192.168.100.225:7878/$repo/os/$arch' /etc/pacman.d/mirrorlist
+sed -i '1iServer = http://192.168.100.20:7878/$repo/os/$arch' /etc/pacman.d/mirrorlist
 # Install base files and update fstab.
 pacstrap -K /mnt base linux linux-firmware intel-ucode btrfs-progs pacman-contrib
 genfstab -U /mnt >> /mnt/etc/fstab
